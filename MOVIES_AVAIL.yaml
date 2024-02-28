@@ -1,0 +1,111 @@
+openapi: 3.0.0
+info:
+  title: Movies Available API
+  description: Provide list of available movies based on given date and location / allows for the management of the movie list.
+  version: 1.0.0
+
+servers:
+  - url: https://hometown.movies.com/api/movies_avail_api
+    description: example website URL to movies_avail api
+paths:
+  /movies_avail:
+    get:
+      summary: Returns a list of available movies.
+      parameters:
+        - in: query
+          name: date
+          schema:
+            type: string
+            format: date
+          required: true
+          description: DD-MM-YYY format date of requested movie.
+        - in: query
+          name: location
+          schema:
+            type: int
+          required: true
+          description: General area (ZipCode) of user to find local theatres.
+      responses:
+        "200":
+          description: A JSON array of available movies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    movieID:
+                      type: string
+                      description: Movie unique identifier.
+                    title:
+                      type: string
+                      description: Movie title.
+                    summary:
+                      type: string
+                      description: Movie summary.
+                    posterIMG:
+                      type: string
+                      format: uri
+                      description: Movie poster URL.
+        "400":
+          description: Bad request, user error.
+        "404":
+          description: No movies found for given date and location.
+        "500":
+          description: Internal Server Error.
+    post:
+      summary: Add new movie
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Movie title.
+                summary:
+                  type: string
+                  description: Movie summary.
+                posterIMG:
+                  type: string
+                  format: uri
+                  description: Movie poster URL.
+                releaseDate:
+                  type: string
+                  format: date
+                  description: Movie release date.
+              required:
+                - title
+                - summary
+                - releaseDate
+      responses:
+        "201":
+          description: Movie added successfully.
+        "400":
+          description: Bad request, user error.
+        "500":
+          description: Internal Server Error.
+    delete:
+      summary: Remove a movie
+      parameters:
+        - in: query
+          name: movieID
+          schema:
+            type: string
+          required: true
+          description: Movie to be removed indentifier.
+      responses:
+        "200":
+          description: Movie removed successfully .
+        "400":
+          description: Bad request, user error.
+        "404":
+          description: No movie found with given movieID.
+        "500":
+          description: Internal Server Error.
+
+security:
+  - BasicAuth: []
